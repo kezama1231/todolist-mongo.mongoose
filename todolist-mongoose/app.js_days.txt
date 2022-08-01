@@ -1,0 +1,143 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+
+app.use(bodyParser.urlencoded({extended : true}));
+
+app.get("/", function(request,response){
+
+  //creating date object to get index of the current day in the week
+  let date_obj = new Date();
+  //creating map to insert index and day names
+  const days = new Map();
+
+  //set days
+  days.set(0,"Sunday");
+  days.set(1,"Monday");
+  days.set(2,"Tuesday");
+  days.set(3,"Wednesday");
+  days.set(4,"Thursday");
+  days.set(5,"Friday");
+  days.set(6,"Saturday");
+
+  //get current day name
+  var dayToday = days.get(date_obj.getDay());
+
+  //send a response
+  response.write("<h2> " + dayToday + " </h2>");
+  response.write("<h3>Server is up !</h3>");
+  response.send();
+
+});
+
+app.listen(3000, function(){
+  console.log("Server has started on port 3000");
+  console.log("Server Details");
+  console.log("1. Sets up server for a to-do-list web application with Angela");
+  console.log("2. Author is Simranjeet Singh");
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const date = require(__dirname + '/date.js');
+const db = require(__dirname + '/mongoose.js');
+const mongoose =  require('mongoose');
+const app = express();
+
+console.log(date);
+
+app.use(bodyParser.urlencoded({extended : true}));
+app.use("/css", express.static('css'));
+app.set('view engine', 'ejs');
+db.establishConnection("mongodb://localhost:27017/todolistDB");
+
+//require schema
+const model = db.createSchemaAndModel('todolist_items');
+
+let userItems = ["Watch Obi Wan", "Play Dota", "Get Jacked"];
+let userItems2 = [];
+let workItems = [];
+let result = new Promise(function(resolve, reject){
+  model.find({}, function(err, docs){
+    if(err){
+      console.log("Error occured retrieving documents from database.");
+      reject(err);
+    }else{
+      docs.forEach(function(value){
+        userItems2.push(value.name);
+      });
+      resolve("Documents are loaded into web application.");
+    }
+  });
+});
+result.then(
+  function(success){
+    console.log(userItems2);
+    console.log(success);
+  },
+  function(err){
+    console.log(err);
+  }
+);
+
+app.get("/", function(request,response){
+  let today = date.getDate();
+  let docArray = [{name : "Welcome to our To-do-list"},{name : "Hit + button to add a new item"},{name : "<-- Hit this to delete an item"}];
+  //Inserted once to populate DB
+  if(userItems2.length == 0)
+  model.insertMany(docArray, function(err, docs){
+    if(err){
+      console.log("Inserting documents encountered some error");
+      console.log(err);
+    }else{
+      console.log(docs + "\n" + "has successfully been inserted to database.");
+    }
+  });
+  response.render('list',{
+    listTitle : today,
+    newItem : userItems2});
+});
+
+app.post("/", function(request,response){
+  //console.log(request.body);
+  let userItem = request.body.newItem;
+  if(request.body.list == 'Work'){
+    workItems.push(userItem);
+    response.redirect("/work");
+  } else{
+    userItems.push(userItem);
+    response.redirect("/");
+  }
+});
+
+app.get("/work" , function(request,response){
+  response.render("list", {listTitle : "Work", newItem : workItems});
+});
+
+app.post("/work", function(request,response){
+  let item = request.body.newItem;
+  workItems.push(item);
+  response.redirect("/work");
+});
+
+app.get("/about",function(request,response){
+  response.render('about');
+});
+
+
+
+app.listen(3000,function(){
+  console.log("Server has started listening on port 3000.");
+})

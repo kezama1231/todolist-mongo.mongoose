@@ -1,0 +1,19 @@
+<%- include('header') %>
+
+<div class="container">
+  <h1>Compose</h1>
+  <form class="mt-4" action="/compose" method="post">
+    <div class="form-group">
+      <label for="title" class="font-weight-bold"> Title</label>
+      <input id="title" class="form-control" name="title" type="text" placeholder="So what's the title...">
+    </div>
+    <div class="form-group">
+      <label for="post" class="font-weight-bold">Post</label>
+      <textarea name="post" placeholder="Enter some text here..." class="form-control" rows="8" cols="80"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary" name="button">Publish</button>
+  </form>
+</div>
+
+<%- include('footer') %>

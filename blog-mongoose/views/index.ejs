@@ -1,0 +1,11 @@
+<%- include('header.ejs') %>
+<div class="container">
+  <h1 class="mt-4">Hello</h1>
+  <p><%=ejs_secondaryHeaders %></p>
+  <% ejs_posts.forEach(function(value, index){ %>
+    <h1 class="mt-5 d-block"><%=value.title %></h1>
+    <p class="d-inline"><%=value.post.substring(0,99) + "..." %></p>
+    <a href="/posts/<%=value.title%>">Read More</a>
+  <% }); %>
+</div>
+<%- include('footer.ejs') %>
