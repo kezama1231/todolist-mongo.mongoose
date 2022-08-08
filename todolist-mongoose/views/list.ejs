@@ -4,12 +4,22 @@
 </div>
 
 <div class="box">
+
+  <% newItem.forEach(function(value){ %>
+    <div class="item">
+      <input type="checkbox">
+      <p><%=value %></p>
+    </div>
+  <% }); %>
+<!-- for-loop replaced with for-each -->
+<!--
   <% for(var loop = 0; loop < newItem.length; loop++){ %>
   <div class="item">
     <input type="checkbox">
     <p><%= newItem[loop] %></p>
   </div>
-  <% } %>
+  <% } %> -->
+
   <form action="/" method="post" class="item" autocomplete="off">
   <input name="newItem" type="text" placeholder="New Item">
   <!--BUTTON -->

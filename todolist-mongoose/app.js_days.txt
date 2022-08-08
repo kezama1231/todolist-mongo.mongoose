@@ -69,46 +69,28 @@ const model = db.createSchemaAndModel('todolist_items');
 let userItems = ["Watch Obi Wan", "Play Dota", "Get Jacked"];
 let userItems2 = [];
 let workItems = [];
-let result = new Promise(function(resolve, reject){
-  model.find({}, function(err, docs){
-    if(err){
-      console.log("Error occured retrieving documents from database.");
-      reject(err);
-    }else{
-      docs.forEach(function(value){
-        userItems2.push(value.name);
-      });
-      resolve("Documents are loaded into web application.");
-    }
-  });
-});
-result.then(
-  function(success){
-    console.log(userItems2);
-    console.log(success);
-  },
-  function(err){
-    console.log(err);
-  }
-);
 
 app.get("/", function(request,response){
   let today = date.getDate();
   let docArray = [{name : "Welcome to our To-do-list"},{name : "Hit + button to add a new item"},{name : "<-- Hit this to delete an item"}];
   //Inserted once to populate DB
-  if(userItems2.length == 0)
-  model.insertMany(docArray, function(err, docs){
-    if(err){
-      console.log("Inserting documents encountered some error");
-      console.log(err);
-    }else{
-      console.log(docs + "\n" + "has successfully been inserted to database.");
+  model.find({}, function(err,docs){
+    if(docs === 0){
+      model.insertMany(docArray, function(err){
+        if(err){
+          console.log(err);
+        }else{
+          console.log("Successfully saved items to database.");
+        }
+      });
     }
+    request.redirect("/");
+  }else{
+    response.render('list',{
+      listTitle : today,
+      newItem : userItems2});
   });
-  response.render('list',{
-    listTitle : today,
-    newItem : userItems2});
-});
+};
 
 app.post("/", function(request,response){
   //console.log(request.body);
